@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopEasy - GitHub Storage</title>
+    <title>CARDERS HUB - Shopping App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -52,6 +52,7 @@
         nav ul {
             display: flex;
             list-style: none;
+            align-items: center;
         }
         
         nav ul li {
@@ -67,6 +68,22 @@
         
         nav ul li a:hover {
             color: #ffde7d;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: none;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
         
         /* Login Form */
@@ -472,6 +489,12 @@
             padding: 20px;
             color: #6a11cb;
         }
+        
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -480,13 +503,13 @@
         <div class="container header-content">
             <div class="logo">
                 <i class="fas fa-shopping-bag"></i>
-                <span>ShopEasy</span>
+                <span>CARDERS HUB</span>
             </div>
             <nav>
                 <ul>
                     <li><a href="#" onclick="showUserView()">Home</a></li>
                     <li><a href="#" onclick="showAdminPanel()">Admin Panel</a></li>
-                    <li><a href="#" onclick="showGitHubConfig()">GitHub Setup</a></li>
+                    <li><button class="logout-btn" onclick="logout()">Logout</button></li>
                 </ul>
             </nav>
         </div>
@@ -494,37 +517,9 @@
 
     <!-- Main Content -->
     <div class="container">
-        <!-- GitHub Configuration -->
-        <div id="githubConfig" class="github-config" style="display: none;">
-            <h2>GitHub Repository Setup</h2>
-            <div class="config-note">
-                <p><strong>Note:</strong> To use this app with GitHub storage, you need to:</p>
-                <ol>
-                    <li>Create a new GitHub repository</li>
-                    <li>Generate a personal access token with repo permissions</li>
-                    <li>Enter your details below</li>
-                </ol>
-            </div>
-            
-            <div class="form-group">
-                <label for="githubUsername">GitHub Username</label>
-                <input type="text" id="githubUsername" placeholder="Your GitHub username">
-            </div>
-            <div class="form-group">
-                <label for="githubRepo">Repository Name</label>
-                <input type="text" id="githubRepo" placeholder="Your repository name">
-            </div>
-            <div class="form-group">
-                <label for="githubToken">Personal Access Token</label>
-                <input type="password" id="githubToken" placeholder="Your GitHub token">
-            </div>
-            <button class="btn" onclick="saveGitHubConfig()">Save Configuration</button>
-            <button class="btn" style="background: #4cd137; margin-top: 10px;" onclick="testGitHubConnection()">Test Connection</button>
-        </div>
-
         <!-- Login Form (Initially Visible) -->
         <div id="loginForm" class="login-container">
-            <h2>Login to Your Account</h2>
+            <h2>Login to CARDERS HUB</h2>
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" placeholder="Enter your username">
@@ -534,6 +529,7 @@
                 <input type="password" id="password" placeholder="Enter your password">
             </div>
             <button class="btn" onclick="login()">Login</button>
+            <div id="loginError" class="error-message"></div>
             <div class="create-account">
                 <p>Don't have an account? <a href="#" onclick="showRegisterForm()">Create Account</a></p>
             </div>
@@ -648,4 +644,24 @@
                 <button class="send-btn" onclick="sendMessage()">
                     <i class="fas fa-paper-plane"></i>
                 </button>
-        
+            </div>
+            <div class="payment-section">
+                <p><strong>Selected Product:</strong> <span id="selectedProduct"></span></p>
+                <p><strong>Price:</strong> $<span id="productPrice"></span></p>
+                <button class="payment-btn" onclick="processPayment()">Process Manual Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Button -->
+    <div class="chat-button" onclick="openChat()">
+        <i class="fas fa-comments"></i>
+    </div>
+
+    <script>
+        // GitHub Configuration - Replace with your actual token
+        const githubConfig = {
+            username: "JACKOSBON",
+            repo: "Tg-store",
+            token: "github_pat_11ABC123YZ_abcdefghij1234567890abcdefghijklmnopqrstuvwxyz1234"
+  
