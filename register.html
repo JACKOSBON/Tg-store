@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Create Account — Carders Hub</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><div class="brand-icon">👜</div><div><div class="brand-title">CARDERS</div><div class="brand-sub">HUB</div></div></div>
+  </header>
+
+  <main class="auth-container">
+    <form id="regForm" class="auth-card">
+      <h2>Create Account</h2>
+      <label>Full name
+        <input id="fullname" required />
+      </label>
+      <label>Username
+        <input id="rusername" required />
+      </label>
+      <label>Password
+        <input id="rpassword" type="password" required />
+      </label>
+      <button class="btn primary" type="submit">Create Account</button>
+      <p class="muted">Already have an account? <a href="login.html">Login</a></p>
+    </form>
+  </main>
+
+<script>
+document.getElementById('regForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const fullname = document.getElementById('fullname').value.trim();
+  const username = document.getElementById('rusername').value.trim();
+  const password = document.getElementById('rpassword').value;
+  if(!username||!password) return alert('Fill fields');
+  const users = JSON.parse(localStorage.getItem('users')||'[]');
+  if(users.find(u=>u.username===username)) return alert('Username taken');
+  users.push({username,password,isAdmin:false,fullName:fullname, banned:false});
+  localStorage.setItem('users', JSON.stringify(users));
+  localStorage.setItem('currentUser', JSON.stringify({username,password,isAdmin:false,fullName:fullname, banned:false}));
+  alert('Account created and logged in');
+  window.location.href = 'index.html';
+});
+</script>
+</body>
+</html>
