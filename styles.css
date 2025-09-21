@@ -1,0 +1,52 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f7f7f7;
+}
+
+header {
+  background: #333;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+nav a, nav button {
+  color: white;
+  margin-left: 10px;
+  text-decoration: none;
+  background: #444;
+  padding: 6px 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+h2 {
+  text-align: center;
+  margin: 20px 0;
+}
+
+form {
+  max-width: 300px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+form input, form button {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.product {
+  border: 1px solid #ddd;
+  margin: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  background: white;
+  text-align: center;
+}
