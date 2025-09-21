@@ -1,44 +1,53 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Login — Carders Hub</title>
-<link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Carders Hub</title>
+  <link rel="stylesheet" href="login.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand"><div class="brand-icon">👜</div><div><div class="brand-title">CARDERS</div><div class="brand-sub">HUB</div></div></div>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">👜 CARDERS HUB</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#">Admin Panel</a>
+    </nav>
   </header>
 
-  <main class="auth-container">
-    <form id="loginForm" class="auth-card">
-      <h2>Login to CARDERS HUB</h2>
-      <label>Username
-        <input id="username" required />
-      </label>
-      <label>Password
-        <input id="password" type="password" required />
-      </label>
-      <button class="btn primary" type="submit">Login</button>
-      <p class="muted">Don't have an account? <a href="register.html">Create Account</a></p>
-    </form>
-  </main>
+  <!-- Login Box -->
+  <div class="login-container">
+    <h2>Login to CARDERS HUB</h2>
+    <form onsubmit="return loginUser()">
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter username" required>
+      </div>
 
-<script>
-document.getElementById('loginForm').addEventListener('submit', async function(e){
-  e.preventDefault();
-  const u = document.getElementById('username').value.trim();
-  const p = document.getElementById('password').value;
-  // load users via app's load function through app.js storage (local fallback)
-  const res = await fetch('./app.js'); // dummy to ensure file exists (not used)
-  // We'll rely on app.js wrapper that stores users in repo; for simplicity use localStorage here:
-  const users = JSON.parse(localStorage.getItem('users')||'[]');
-  const found = users.find(x=>x.username===u && x.password===p);
-  if(!found){ alert('Invalid username or password'); return; }
-  localStorage.setItem('currentUser', JSON.stringify(found));
-  window.location.href = 'index.html';
-});
-</script>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter password" required>
+      </div>
+
+      <button type="submit" class="btn">Login</button>
+      <p class="account-text">Don't have an account? <a href="#">Create Account</a></p>
+    </form>
+  </div>
+
+  <script>
+    function loginUser() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (username === "admin" && password === "1234") {
+        alert("Login Successful!");
+        window.location.href = "index.html";
+      } else {
+        alert("Invalid username or password");
+      }
+      return false; // form submit रोकने के लिए
+    }
+  </script>
 </body>
 </html>
