@@ -1,6 +1,6 @@
 // ====== CONFIG - REPLACE these with your values AFTER worker deploy =====
-const WORKER_BASE = 'https://REPLACE_WITH_YOUR_WORKER_URL'; // e.g. https://myworker.account.workers.dev
-const CLIENT_API_KEY = 'REPLACE_WITH_CLIENT_API_KEY'; // same as API_KEY secret in Cloudflare
+const WORKER_BASE = 'https://darkstore.tauseefrza458.workers.dev/'; // e.g. https://myworker.account.workers.dev
+const CLIENT_API_KEY = 'mykey-taztk'; // same as API_KEY secret in Cloudflare
 // =========================================================================
 
 /* app.js - frontend logic: products, users, chats */
