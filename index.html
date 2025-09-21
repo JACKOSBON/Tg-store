@@ -1,62 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CARDERS HUB</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carders Hub</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="logo"> CARDERS <span>HUB</span></div>
-    <ul class="nav-links">
-      <li><a href="#">Home</a></li>
-      <li><button class="logout-btn">Logout</button></li>
-    </ul>
-  </nav>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">👜 CARDERS HUB</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <button onclick="logout()">Logout</button>
+    </nav>
+  </header>
 
-  <!-- Products Section -->
-  <section class="products">
-    <h2>Our Products</h2>
+  <!-- Products Section -->
+  <section class="products">
+    <h2>Our Products</h2>
+    <div class="product-list">
+      <div class="product-card">
+        <img src="https://via.placeholder.com/150" alt="Premium Smartphone">
+        <h3>Premium Smartphone</h3>
+        <p class="price">$599.99</p>
+        <button class="btn">Buy Now</button>
+      </div>
 
-    <div class="product-card">
-      <img src="https://via.placeholder.com/150" alt="Premium Smartphone">
-      <h3>Premium Smartphone</h3>
-      <p class="price">$599.99</p>
-      <button class="buy-btn">Buy Now</button>
-    </div>
+      <div class="product-card">
+        <img src="https://via.placeholder.com/150" alt="Wireless Headphones">
+        <h3>Wireless Headphones</h3>
+        <p class="price">$199.99</p>
+        <button class="btn">Buy Now</button>
+      </div>
 
-    <div class="product-card">
-      <img src="https://via.placeholder.com/150" alt="Wireless Headphones">
-      <h3>Wireless Headphones</h3>
-      <p class="price">$199.99</p>
-      <button class="buy-btn">Buy Now</button>
-    </div>
+      <div class="product-card">
+        <img src="https://via.placeholder.com/150" alt="Smart Watch">
+        <h3>Smart Watch</h3>
+        <p class="price">$149.99</p>
+        <button class="btn">Buy Now</button>
+      </div>
+    </div>
+  </section>
 
-    <div class="product-card">
-      <img src="https://via.placeholder.com/150" alt="Smart Watch">
-      <h3>Smart Watch</h3>
-      <p class="price">$149.99</p>
-      <button class="buy-btn">Buy Now</button>
-    </div>
-  </section>
-
-  <!-- Floating Chat Button -->
-  <button class="chat-btn" onclick="toggleChat()"></button>
-
-  <!-- Chat Box -->
-  <div class="chat-box" id="chatBox">
-    <div class="chat-box-header">Chat</div>
-    <div class="chat-box-messages" id="messages">
-      <p><b>Bot:</b> Welcome! How can I help you?</p>
-    </div>
-    <div class="chat-box-input">
-      <input type="text" id="chatInput" placeholder="Type a message...">
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
