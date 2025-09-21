@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin Panel — Carders Hub</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><div class="brand-icon">👜</div><div><div class="brand-title">CARDERS</div><div class="brand-sub">HUB</div></div></div>
+    <nav class="nav"><a href="index.html">Home</a><button id="logoutBtn" class="pill">Logout</button></nav>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Admin Panel</h1>
+
+    <section class="admin-section">
+      <h2>Products</h2>
+      <form id="addProductForm" class="auth-card">
+        <label>Title <input id="pTitle" required /></label>
+        <label>Price <input id="pPrice" required type="number" step="0.01" /></label>
+        <button class="btn primary" type="submit">Add Product</button>
+      </form>
+      <div id="adminProducts" class="admin-grid"></div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Users</h2>
+      <div id="adminUsers"></div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Chats</h2>
+      <div id="chatsList"></div>
+    </section>
+  </main>
+
+  <div id="adminChatModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="close" id="closeAdminChat">✕</button>
+      <h2 id="adminChatTitle">Chat</h2>
+      <div id="adminChatMessages" class="chat-messages"></div>
+      <div class="chat-input-row">
+        <input id="adminChatText" placeholder="Message as admin..." />
+        <button id="adminSend" class="btn">Send</button>
+        <button id="markPaid" class="btn">Mark Paid</button>
+      </div>
+    </div>
+  </div>
+
+<script src="app.js"></script>
+</body>
+</html>
