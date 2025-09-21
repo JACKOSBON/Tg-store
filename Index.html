@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARKSTORE - E-commerce App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4757, #ff3742);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #2ed573, #1abc9c);
+        }
+
+        /* Login/Register Forms */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .auth-form {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            width: 400px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00d4ff;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 212, 255, 0.2);
+        }
+
+        .product-card.selected {
+            border: 2px solid #00d4ff;
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+
+        .product-price {
+            font-size: 20px;
+            color: #2ed573;
+            font-weight: bold;
+        }
+
+        /* Cart */
+        .cart-sidebar {
+            position: fixed;
+            right: -350px;
+            top: 0;
+            width: 350px;
+            height: 100vh;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            transition: right 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .cart-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            background: rgba(0, 212, 255, 0.2);
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 70%;
+        }
+
+        .message.user {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.admin {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0 0 15px 15px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-right: 10px;
+        }
+
+        .chat-input input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Profile */
+        .profile-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .auth-form {
+                width: 90%;
+                padding: 20px;
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .floating-cart-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .floating-cart-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .demo-info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .demo-info h4 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <div class="header" id="mainHeader" style="display: none;">
+            <div class="logo">🛍️ DARKSTORE</div>
+            <div class="nav-buttons">
+                <button class="btn" id="profileBtn">👤 Profile</button>
+                <button class="btn btn-danger" id="logoutBtn">🚪 Logout</button>
+            </div>
+        </div>
+
+        <!-- Login/Register Page -->
+        <div id="authPage" class="auth-container">
+            <div class="auth-form">
+                <h2 style="margin-bottom: 30px; color: #00d4ff;">Welcome to DARKSTORE</h2>
+                
+                <!-- Demo Credentials Info -->
+                <div class="demo-info">
+                    <h4>🔑 Demo Login Credentials:</h4>
+                    <p><strong>Admin:</strong> admin / @adminTAZTK</p>
+                    <p><strong>User:</strong> user1 / user123</p>
+                </div>
+                
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="loginUsername" class="form-control" placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter password">
+                    </div>
+                    <button class="btn" id="loginBtn" style="width: 100%; margin-bottom: 15px;">🔑 Login</button>
+                    <button class="btn btn-success" id="showRegisterBtn" style="width: 100%;">📝 Create New User Account</button>
+                </div>
+
+                <div id="registerForm" class="hidden">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="registerUsername" class="form-control" placeholder="Choose username (min 3 chars)">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" class="form-control" placeholder="Choose password (min 3 chars)">
+                    </div>
+                    <p style="font-size: 12px; opacity: 0.8; margin-bottom: 15px;">Note: All new accounts are User accounts only.</p>
+                    <button class="btn btn-success" id="registerBtn" style="width: 100%; margin-bottom: 15px;">✅ Create Account</button>
+                    <button class="btn" id="showLoginBtn" style="width: 100%;">🔙 Back to Login</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" class="container hidden">
+            <!-- User View -->
+            <div id="userView">
+                <h2 style="margin-bottom: 30px; text-align: center;">🛍️ Products</h2>
+                <div id="productGrid" class="product-grid">
+                    <!-- Products will be loaded here -->
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-success" id="finalizeBtn">🛒 Finalize Selection (<span id="selectionCount">0</span> items)</button>
+                </div>
+            </div>
+
+            <!-- Admin View -->
+            <div id="adminView" class="hidden">
+                <div class="admin-panel">
+                    <div class="admin-tabs">
+                        <button class="tab-btn active" data-tab="products">📦 Products</button>
+                        <button class="tab-btn" data-tab="users">👥 Users</button>
+                        <button class="tab-btn" data-tab="chats">💬 Chats</button>
+                    </div>
+
+                    <div id="adminProducts" class="tab-content active">
+                        <h3>Add New Product</h3>
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" id="productName" class="form-control" placeholder="Enter product name">
+                        </div>
+                        <div class="form-group">
+                            <label>Price (₹)</label>
+                            <input type="number" id="productPrice" class="form-control" placeholder="Enter price">
+                        </div>
+                        <div class="form-group">
+                            <label>Emoji</label>
+                            <input type="text" id="productEmoji" class="form-control" placeholder="📱" maxlength="2">
+                        </div>
+                        <div class="form-group">
+                            <label>Product Image (Optional)</label>
+                            <input type="file" id="productImage" class="form-control" accept="image/*">
+                            <small style="opacity: 0.7;">Supported: JPG, PNG, GIF (Max 2MB)</small>
+                        </div>
+                        <button class="btn btn-success" id="addProductBtn">➕ Add Product</button>
+                        
+                        <h3 style="margin-top: 30px;">Existing Products</h3>
+                        <div id="adminProductList" class="product-grid">
+                            <!-- Admin products will be shown here -->
+                        </div>
+                    </div>
+
+                    <div id="adminUsers" class="tab-content">
+                        <h3>Registered Users</h3>
+                        <div id="usersList">
+                            <!-- Users will be shown here -->
+                        </div>
+                    </div>
+
+                    <div id="adminChats" class="tab-content">
+                        <h3>Active Chats</h3>
+                        <div id="chatsList">
+                            <!-- Active chats will be shown here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profilePage" class="hidden">
+                <div class="profile-container">
+                    <h2 style="text-align: center; margin-bottom: 30px;">👤 Profile Settings</h2>
+                    
+                    <div class="form-group">
+                        <label>Current Username</label>
+                        <input type="text" id="currentUsername" class="form-control" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>New Username (optional)</label>
+                        <input type="text" id="newUsername" class="form-control" placeholder="Enter new username">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>New Password (optional)</label>
+                        <input type="password" id="newPassword" class="form-control" placeholder="Enter new password">
+                    </div>
+                    
+                    <button class="btn btn-success" id="updateProfileBtn" style="width: 100%; margin-bottom: 15px;">💾 Update Profile</button>
+                    <button class="btn" id="backToMainBtn" style="width: 100%;">🔙 Back to Main</button>
+                </div>
+            </div>
+
+            <!-- Chat Page -->
+            <div id="chatPage" class="hidden">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h3 id="chatTitle">💬 Chat</h3>
+                        <button class="btn btn-danger" id="closeChatBtn">❌ Close</button>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <!-- Chat messages will appear here -->
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="messageInput" placeholder="Type your message..." maxlength="500">
+                        <button class="btn" id="sendMessageBtn">📤 Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Sidebar -->
+        <div class="cart-sidebar" id="cartSidebar">
+            <div class="cart-header">
+                <h3>🛒 Selected Products</h3>
+                <button class="btn btn-danger" id="closeCartBtn">❌</button>
+            </div>
+            <div id="cartItems">
+                <p style="text-align: center; opacity: 0.7;">No products selected yet.</p>
+            </div>
+        </div>
+
+        <!-- Floating Cart Button -->
+        <button class="floating-cart-btn hidden" id="floatingCartBtn">
+            🛒
+            <span class="cart-count" id="cartCount">0</span>
+        </button>
+    </div>
+
+    <script>
+        // Global state
+        let currentUser = null;
+        let products = [
+            { id: 1, name: 'Smartphone', price: 15999, emoji: '📱', image: null },
+            { id: 2, name: 'Laptop', price: 45999, emoji: '💻', image: null },
+            { id: 3, name: 'Headphones', price: 2999, emoji: '🎧', image: null },
+            { id: 4, name: 'Watch', price: 8999, emoji: '⌚', image: null },
+            { id: 5, name: 'Camera', price: 25999, emoji: '📷', image: null },
+            { id: 6, name: 'Gaming Console', price: 35999, emoji: '🎮', image: null }
+        ];
+        
+        let users = [
+            { username: 'admin', password: '@adminTAZTK', type: 'admin' },
+            { username: 'user1', password: 'user123', type: 'user' },
+            { username: 'user2', password: 'user456', type: 'user' }
+        ];
+        
+        let selectedProducts = [];
+        let chats = {};
+        let currentChatProduct = null;
+        let isAdminChat = false;
+        let adminChatKey = '';
+
+        // Initialize app
+        document
