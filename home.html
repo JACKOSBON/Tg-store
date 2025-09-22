@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Home — CARDERS HUB</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dark-bg">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">♦</div>
+      <div class="title">CARDERS&nbsp;HUB</div>
+    </div>
+    <nav class="nav">
+      <a href="home.html" class="nav-link">Courses</a>
+      <a href="#" class="nav-link">About</a>
+      <a href="#" class="nav-link">Contact</a>
+    </nav>
+    <div class="nav-actions">
+      <span id="user-email" class="muted small"></span>
+      <button id="logout" class="btn small ghost">Logout</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-left">
+      <h1>Learn New Skills<br>Online</h1>
+      <p class="muted">Explore our curated courses and learn from industry experts. Purchase via manual payment and chat with admin to confirm.</p>
+      <a href="#courses" class="btn primary">Browse Courses</a>
+    </div>
+    <div class="hero-right">
+      <div class="card compact">
+        <h3>Featured Course</h3>
+        <h2>Mastering JavaScript</h2>
+        <p class="muted">From basics to advanced patterns.</p>
+        <div class="row">
+          <strong>₹999</strong>
+          <button data-id="c-js" class="btn ghost small buy-btn">Buy</button>
+        </div>
+      </div>
+      <div class="card compact">
+        <h3>Chat</h3>
+        <div id="chat-box" class="chat-box">
+          <div id="messages" class="messages"></div>
+          <div class="row">
+            <input id="chat-input" placeholder="Write a message..." />
+            <button id="send-btn" class="btn small primary">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="courses" class="courses">
+    <h2>All Courses</h2>
+    <div id="course-list" class="grid"></div>
+  </section>
+
+  <footer class="footer">
+    <div>© CARDERS HUB</div>
+    <div class="muted">Manual payment: chat with admin to confirm after purchase.</div>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // redirect to login if not logged in handled in app.js
+    document.getElementById('logout').addEventListener('click', async ()=>{
+      await auth.signOut();
+      window.location.href = 'login.html';
+    });
+    document.getElementById('send-btn').addEventListener('click', async ()=>{
+      const txt = document.getElementById('chat-input').value.trim();
+      if(!txt || !currentUser || !currentChatId) return alert('Open a chat by buying a course or from admin panel.');
+      await db.collection('chats').doc(currentChatId).collection('messages').add({
+        sender: currentUser.email,
+        text: txt,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('chat-input').value = '';
+    });
+
+    // Buy buttons navigation
+    document.addEventListener('click', (e)=>{
+      if(e.target.classList.contains('buy-btn')){
+        const id = e.target.dataset.id;
+        if(typeof onBuy === 'function') onBuy({ target: { dataset: { id } } });
+      }
+    });
+  </script>
+</body>
+</html>
