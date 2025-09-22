@@ -1,101 +1,76 @@
-// App behavior connecting UI with Firebase (simple demo)
-// Admin email (treated as admin when signed in)
-const adminEmail = "admin@gmail.com";
+// Import Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { 
+  getAuth, signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  sendPasswordResetEmail, 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const sampleCourses = [
-  { id: "c-js", title: "Mastering JavaScript", price: "₹999" },
-  { id: "c-web", title: "Beginner Web Development", price: "₹499" },
-  { id: "c-fb", title: "Fullstack with Firebase", price: "₹799" }
-];
+// Your Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyApI1Bi18rCpVNlXmPoQDb_y28a8kajAwQ",
+  authDomain: "darkstore-f069a.firebaseapp.com",
+  projectId: "darkstore-f069a",
+  storageBucket: "darkstore-f069a.firebasestorage.app",
+  messagingSenderId: "767024328451",
+  appId: "1:767024328451:web:16e4d2993e265f45e00336",
+  measurementId: "G-R1N3F3MM99"
+};
 
-let currentUser = null;
-let currentChatId = null;
+// Init Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-// render course list
-function renderCourses(){
-  const el = document.getElementById('course-list');
-  if(!el) return;
-  el.innerHTML = '';
-  sampleCourses.forEach(c=>{
-    const d = document.createElement('div');
-    d.className = 'course';
-    d.innerHTML = `<h3>${c.title}</h3><p class="muted">${c.price} — short description.</p>
-      <div class="row"><button data-id="${c.id}" class="btn small primary buy-btn">Buy</button></div>`;
-    el.appendChild(d);
+// Elements
+const loginBtn = document.getElementById("loginBtn");
+const signupLink = document.getElementById("signupLink");
+const forgotPassword = document.getElementById("forgotPassword");
+
+// LOGIN
+if (loginBtn) {
+  loginBtn.addEventListener("click", () => {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+
+    signInWithEmailAndPassword(auth, email, pass)
+      .then(() => {
+        alert("Login successful!");
+        window.location.href = "home.html"; // redirect
+      })
+      .catch(err => alert(err.message));
   });
 }
 
-// buy flow: create purchase and chat
-async function onBuy(e){
-  const courseId = e.target.dataset.id;
-  const course = sampleCourses.find(x=>x.id===courseId);
-  if(!currentUser){ alert('Please login first.'); window.location.href='login.html'; return; }
-  const purchaseRef = await db.collection('purchases').add({
-    userId: currentUser.uid,
-    userEmail: currentUser.email,
-    courseId: course.id,
-    courseTitle: course.title,
-    price: course.price,
-    status: 'pending_manual_payment',
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+// SIGNUP
+if (signupLink) {
+  signupLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    const email = prompt("Enter email for signup:");
+    const pass = prompt("Enter password:");
+
+    createUserWithEmailAndPassword(auth, email, pass)
+      .then(() => alert("Account created! Now login."))
+      .catch(err => alert(err.message));
   });
-  const chatDoc = await db.collection('chats').add({
-    participants: [currentUser.email, adminEmail],
-    purchaseId: purchaseRef.id,
-    courseTitle: course.title,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  await db.collection('chats').doc(chatDoc.id).collection('messages').add({
-    sender: currentUser.email,
-    text: `Hi Admin, I want to buy "${course.title}". I have completed payment. Please confirm.`,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  alert('Purchase recorded. Open chat to confirm manual payment.');
-  openChat(chatDoc.id);
 }
 
-// open chat and listen
-function openChat(chatId){
-  currentChatId = chatId;
-  const messagesEl = document.getElementById('messages');
-  if(!messagesEl) return;
-  messagesEl.innerHTML = '';
-  db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp')
-    .onSnapshot(snap=>{
-      messagesEl.innerHTML = '';
-      snap.forEach(doc=>{
-        const m = doc.data();
-        const div = document.createElement('div');
-        div.className = 'message' + (m.sender===adminEmail ? ' admin' : '');
-        div.textContent = `${m.sender}: ${m.text}`;
-        messagesEl.appendChild(div);
-      });
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    });
+// FORGOT PASSWORD
+if (forgotPassword) {
+  forgotPassword.addEventListener("click", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    if (!email) return alert("Enter email first!");
+
+    sendPasswordResetEmail(auth, email)
+      .then(() => alert("Reset link sent to your email!"))
+      .catch(err => alert(err.message));
+  });
 }
 
-// auth state
-auth.onAuthStateChanged(user=>{
-  currentUser = user;
-  const userEmailEl = document.getElementById('user-email');
-  if(user){
-    if(userEmailEl) userEmailEl.textContent = user.email;
-    // if admin, show admin-only actions (not implemented fully here)
-    if(user.email === adminEmail){
-      // admin UI could be enhanced
-    }
-    // try to load user's chat if exists: latest chat where user is participant
-    db.collection('chats').where('participants','array-contains', user.email).limit(1).get()
-      .then(q=>{
-        if(!q.empty){
-          openChat(q.docs[0].id);
-        }
-      });
-  } else {
-    if(userEmailEl) userEmailEl.textContent = '';
-    // redirect to login if on pages that require auth
+// AUTO-REDIRECT if logged in
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("Logged in as", user.email);
   }
 });
-
-// initial render
-renderCourses();
