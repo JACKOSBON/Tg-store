@@ -1,18 +1,641 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home - Glass Firebase Auth</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassStyle Shop</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary-color: #4e54c8;
+            --secondary-color: #8f94fb;
+            --text-color: #333;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(to right, #4e54c8, #8f94fb);
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .glass-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            box-shadow: var(--glass-shadow);
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            margin: 20px 0;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #fff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember input {
+            margin-right: 8px;
+        }
+
+        .forgot {
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .forgot:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(to right, #ff6b6b, #ff8e8e);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .create-account {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+        }
+
+        .create-account a {
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .create-account a:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+        }
+
+        .divider span {
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .divider p {
+            padding: 0 15px;
+            font-size: 14px;
+        }
+
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Home Page Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .product-card {
+            background: var(--glass-bg);
+            border-radius: 18px;
+            padding: 20px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .product-card img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .product-card h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .product-card p {
+            margin-bottom: 15px;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .product-card .price {
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(to right, #4e54c8, #8f94fb);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .buy-btn:hover {
+            opacity: 0.9;
+        }
+
+        .chat-section {
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chat-container {
+            background: var(--glass-bg);
+            border-radius: 18px;
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            margin-bottom: 10px;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(to right, #4e54c8, #8f94fb);
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.admin {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.2);
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-input {
+            display: flex;
+            margin-top: 15px;
+            gap: 10px;
+        }
+
+        .message-input input {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .message-input button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(to right, #4e54c8, #8f94fb);
+            color: white;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .glass-container {
+                padding: 20px;
+            }
+            
+            .options {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="glass-container">
-    <h1>Welcome Home 🎉</h1>
-    <p>You are successfully logged in!</p>
-    <button id="logoutBtn">Logout</button>
-  </div>
-  <script src="firebase.js"></script>
-  <script src="app.js"></script>
-</body>
-</html>
+    <!-- Login Page -->
+    <div id="loginPage" class="glass-container">
+        <div class="logo">
+            <h1>GlassStyle Shop</h1>
+        </div>
+        
+        <div class="input-group">
+            <label for="email">Username</label>
+            <input type="text" id="email" placeholder="Enter your username">
+        </div>
+        
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password">
+        </div>
+        
+        <div class="options">
+            <div class="remember">
+                <input type="checkbox" id="remember">
+                <label for="remember">Remember me</label>
+            </div>
+            <a href="#" class="forgot">Forget Password?</a>
+        </div>
+        
+        <button class="btn" id="loginBtn">LOGIN</button>
+        
+        <div class="create-account">
+            <p>Don't have an account? <a href="#" id="showSignup">Create Account</a></p>
+        </div>
+        
+        <div class="divider">
+            <span></span>
+            <p>Or login with</p>
+            <span></span>
+        </div>
+        
+        <div class="social-login">
+            <div class="social-btn">
+                <i class="fab fa-google"></i>
+            </div>
+            <div class="social-btn">
+                <i class="fab fa-facebook-f"></i>
+            </div>
+            <div class="social-btn">
+                <i class="fab fa-twitter"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Page (Hidden Initially) -->
+    <div id="signupPage" class="glass-container hidden">
+        <div class="logo">
+            <h1>Create Account</h1>
+        </div>
+        
+        <div class="input-group">
+            <label for="signupName">Full Name</label>
+            <input type="text" id="signupName" placeholder="Enter your full name">
+        </div>
+        
+        <div class="input-group">
+            <label for="signupEmail">Email</label>
+            <input type="email" id="signupEmail" placeholder="Enter your email">
+        </div>
+        
+        <div class="input-group">
+            <label for="signupPassword">Password</label>
+            <input type="password" id="signupPassword" placeholder="Create a password">
+        </div>
+        
+        <div class="input-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm your password">
+        </div>
+        
+        <button class="btn" id="signupBtn">CREATE ACCOUNT</button>
+        
+        <div class="create-account">
+            <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
+        </div>
+    </div>
+
+    <!-- Home Page (Hidden Initially) -->
+    <div id="homePage" class="hidden">
+        <div class="navbar">
+            <div class="logo">
+                <h1>GlassStyle Shop</h1>
+            </div>
+            <div class="nav-links">
+                <button class="nav-btn" id="homeBtn"><i class="fas fa-home"></i> Home</button>
+                <button class="nav-btn" id="profileBtn"><i class="fas fa-user"></i> Profile</button>
+                <button class="nav-btn" id="chatBtn"><i class="fas fa-comment"></i> Chats</button>
+                <button class="nav-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <div class="products-grid">
+            <div class="product-card glass-container">
+                <img src="https://via.placeholder.com/300x200/4e54c8/ffffff?text=Product+1" alt="Product 1">
+                <h3>Wireless Headphones</h3>
+                <p>High-quality wireless headphones with noise cancellation</p>
+                <div class="price">$129.99</div>
+                <button class="buy-btn">Buy Now</button>
+            </div>
+            
+            <div class="product-card glass-container">
+                <img src="https://via.placeholder.com/300x200/8f94fb/ffffff?text=Product+2" alt="Product 2">
+                <h3>Smart Watch</h3>
+                <p>Feature-rich smartwatch with health monitoring</p>
+                <div class="price">$199.99</div>
+                <button class="buy-btn">Buy Now</button>
+            </div>
+            
+            <div class="product-card glass-container">
+                <img src="https://via.placeholder.com/300x200/4e54c8/ffffff?text=Product+3" alt="Product 3">
+                <h3>Portable Speaker</h3>
+                <p>Waterproof Bluetooth speaker with 360° sound</p>
+                <div class="price">$79.99</div>
+                <button class="buy-btn">Buy Now</button>
+            </div>
+            
+            <div class="product-card glass-container">
+                <img src="https://via.placeholder.com/300x200/8f94fb/ffffff?text=Product+4" alt="Product 4">
+                <h3>Smartphone</h3>
+                <p>Latest smartphone with high-resolution camera</p>
+                <div class="price">$699.99</div>
+                <button class="buy-btn">Buy Now</button>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <div class="chat-header">
+                <h2>Product Chat</h2>
+                <div class="nav-btn">Wireless Headphones</div>
+            </div>
+            
+            <div class="chat-container glass-container">
+                <div class="message admin">
+                    <p>Hello! How can I help you with your Wireless Headphones?</p>
+                </div>
+                <div class="message user">
+                    <p>Hi, I'm having trouble connecting them to my device.</p>
+                </div>
+                <div class="message admin">
+                    <p>Make sure Bluetooth is enabled on your device and the headphones are in pairing mode.</p>
+                </div>
+                <div class="message user">
+                    <p>Okay, that worked. Thank you!</p>
+                </div>
+            </div>
+            
+            <div class="message-input">
+                <input type="text" placeholder="Type your message here...">
+                <button>Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration (replace with your actual config)
+       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+  apiKey: "AIzaSyApI1Bi18rCpVNlXmPoQDb_y28a8kajAwQ",
+  authDomain: "darkstore-f069a.firebaseapp.com",
+  projectId: "darkstore-f069a",
+  storageBucket: "darkstore-f069a.firebasestorage.app",
+  messagingSenderId: "767024328451",
+  appId: "1:767024328451:web:16e4d2993e265f45e00336",
+  measurementId: "G-R1N3F3MM99"
+    };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // DOM Elements
+        const loginPage = document.getElementById('loginPage');
+        const signupPage = document.getElementById('signupPage');
+        const homePage = document.getElementById('homePage');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const showSignup = document.getElementById('showSignup');
+        const showLogin = document.getElementById('showLogin');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        // Show Signup Page
+        showSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginPage.classList.add('hidden');
+            signupPage.classList.remove('hidden');
+        });
+        
+        // Show Login Page
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupPage.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+        });
+        
+        // Login Function
+        loginBtn.addEventListener('click', () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    loginPage.classList.add('hidden');
+                    homePage.classList.remove('hidden');
+                })
+                .catch((error) => {
+                    alert("Login error: " + error.message);
+                });
+        });
+        
+        // Signup Function
+        signupBtn.addEventListener('click', () => {
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const name = document.getElementById('signupName').value;
+            
+            if (password !== document.getElementById('confirmPassword').value) {
+                alert("Passwords don't match");
+                return;
+            }
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed up 
+                    const user = userCredential.user;
+                    
+                    // Add user to Firestore
+                    return db.collection('users').doc(user.uid).set({
+                        name: name,
+                        email: email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+           
