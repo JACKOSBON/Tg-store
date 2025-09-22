@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CARDERS HUB — Home</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="dark-bg">
+<header class="topbar">
+  <div class="brand"><div class="logo">📚</div><div class="title">CARDERS HUB</div></div>
+  <div class="actions"><span id="userEmail" class="muted small"></span><button id="logout" class="btn ghost small">Logout</button></div>
+</header>
+
+<main class="container">
+  <section class="section">
+    <h2>Available Courses</h2>
+    <div id="courseList" class="grid"></div>
+  </section>
+
+  <section class="section">
+    <h2>Your Purchases</h2>
+    <div id="purchases" class="list muted">No purchases yet.</div>
+  </section>
+</main>
+
+<footer class="footer muted">Manual payment — after clicking Buy, open chat with admin to confirm.</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
