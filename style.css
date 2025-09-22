@@ -1,0 +1,8 @@
+body {font-family: Arial, sans-serif;margin:0;padding:0;background:#f5f5f5;}
+nav {display:flex;justify-content:space-between;align-items:center;background:#111;color:#fff;padding:10px;}
+nav h1 {margin:0;}
+nav button {margin-left:10px;padding:5px 10px;cursor:pointer;}
+.login-container {max-width:300px;margin:50px auto;padding:20px;background:#fff;box-shadow:0 0 10px rgba(0,0,0,0.1);border-radius:10px;text-align:center;}
+.login-container input {width:100%;padding:10px;margin:5px 0;}
+#product-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;padding:20px;}
+.product {background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
