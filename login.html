@@ -1,64 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login — CARDERS HUB</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>CARDERS HUB - Login</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js" defer></script>
 </head>
-<body class="dark-bg">
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">♦</div>
-      <div class="title">CARDERS&nbsp;HUB</div>
-    </div>
-    <button class="menu-btn">☰</button>
-    <a href="home.html" class="btn small ghost">Home</a>
-    <a href="login.html" class="btn small primary">Login</a>
-  </header>
+<body>
+  <div class="login-container">
+    <h2>Welcome to CARDERS HUB</h2>
+    <p>Sign in to access exclusive courses</p>
 
-  <main class="center-card">
-    <form id="login-form" class="card">
-      <h1 class="card-title">Welcome to CARDERS<br>HUB</h1>
-      <p class="muted">Sign in to access exclusive courses</p>
+    <input type="email" id="email" placeholder="Enter your email" required>
+    <input type="password" id="password" placeholder="Enter your password" required>
 
-      <label>Email</label>
-      <input id="email" type="email" placeholder="Enter your email" />
+    <label>
+      <input type="checkbox" id="remember"> Remember me
+    </label>
+    <a href="#" id="forgotPassword">Forgot Password?</a>
 
-      <label>Password</label>
-      <input id="password" type="password" placeholder="Enter your password" />
-
-      <div class="row space">
-        <label class="checkbox"><input id="remember" type="checkbox" /> Remember me</label>
-        <a href="#" class="muted link-orange">Forgot Password?</a>
-      </div>
-
-      <button id="login-btn" class="btn primary large">LOGIN</button>
-
-      <p class="muted center">Don't have an account? <a href="#" class="link-orange">Create Account</a></p>
-    </form>
-  </main>
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <script src="firebase-config.js"></script>
-  <script src="app.js"></script>
-  <script>
-    // login handler (uses auth from firebase-config.js)
-    document.getElementById('login-form').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      const pass = document.getElementById('password').value;
-      try{
-        await auth.signInWithEmailAndPassword(email, pass);
-        // redirect to home
-        window.location.href = 'home.html';
-      }catch(err){
-        alert(err.message);
-      }
-    });
-  </script>
+    <button id="loginBtn">LOGIN</button>
+    <p>Don’t have an account? <a href="#" id="signupLink">Create Account</a></p>
+  </div>
 </body>
 </html>
