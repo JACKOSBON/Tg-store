@@ -14,4 +14,4 @@ APPROVED_FILE = 'approved.txt'
 DECLINED_FILE = 'declined.txt'
 
 # Delay between sending codes (in seconds)
-DELAY_BETWEEN_CODES = 30
+DELAY_BETWEEN_CODES = 5
