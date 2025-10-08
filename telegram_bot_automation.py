@@ -1,68 +1,85 @@
 import asyncio
 import time
+import re
 from telethon import TelegramClient, events
 from telethon.tl.types import Message
-import config
+import os
 
-class TelegramBotAutomation:
+# Configuration - EDIT THESE VALUES
+API_ID = 12345678  # Get from https://my.telegram.org
+API_HASH = 'your_api_hash_here'  # Get from https://my.telegram.org
+TARGET_BOT = '@username_of_bot_to_check'  # Bot you want to send codes to
+TARGET_GROUP = '@your_group_username'  # Group where approved messages will be forwarded
+CODES_FILE = 'codes.txt'
+APPROVED_FILE = 'approved.txt'
+DECLINED_FILE = 'declined.txt'
+DELAY_BETWEEN_CODES = 5  # Seconds between sending codes
+
+class TelegramAutomation:
     def __init__(self):
-        self.client = TelegramClient(
-            'session_name',
-            config.API_ID,
-            config.API_HASH
-        )
-        self.approved_codes = set()
-        self.declined_codes = set()
-        self.load_existing_codes()
+        self.client = TelegramClient('session_name', API_ID, API_HASH)
+        self.current_code = None
+        self.waiting_for_result = False
+        self.code_sent_time = None
+        self.processed_codes = self.load_processed_codes()
         
-    def load_existing_codes(self):
+    def load_processed_codes(self):
         """Load already processed codes from files"""
+        processed = set()
         try:
-            with open(config.APPROVED_FILE, 'r') as f:
-                self.approved_codes = set(line.strip() for line in f if line.strip())
+            with open(APPROVED_FILE, 'r') as f:
+                for line in f:
+                    if ':' in line:
+                        processed.add(line.split(':')[0].strip())
         except FileNotFoundError:
             pass
             
         try:
-            with open(config.DECLINED_FILE, 'r') as f:
-                self.declined_codes = set(line.strip() for line in f if line.strip())
+            with open(DECLINED_FILE, 'r') as f:
+                for line in f:
+                    if ':' in line:
+                        processed.add(line.split(':')[0].strip())
         except FileNotFoundError:
             pass
+        return processed
     
-    def save_approved_code(self, code):
+    def save_approved(self, code, message):
         """Save approved code to file"""
-        with open(config.APPROVED_FILE, 'a') as f:
-            f.write(f"{code}\n")
-        self.approved_codes.add(code)
+        with open(APPROVED_FILE, 'a') as f:
+            f.write(f"{code}: {message} - {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        print(f"✅ APPROVED: {code}")
     
-    def save_declined_code(self, code):
+    def save_declined(self, code, message):
         """Save declined code to file"""
-        with open(config.DECLINED_FILE, 'a') as f:
-            f.write(f"{code}\n")
-        self.declined_codes.add(code)
+        with open(DECLINED_FILE, 'a') as f:
+            f.write(f"{code}: {message} - {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        print(f"❌ DECLINED: {code}")
     
-    async def send_code_to_bot(self, code):
+    async def send_code(self, code):
         """Send code to target bot"""
         try:
-            await self.client.send_message(config.TARGET_BOT, code)
-            print(f"✅ Code sent: {code}")
+            await self.client.send_message(TARGET_BOT, code)
+            self.current_code = code
+            self.waiting_for_result = True
+            self.code_sent_time = time.time()
+            print(f"📤 Code sent: {code}")
             return True
         except Exception as e:
             print(f"❌ Failed to send code {code}: {e}")
             return False
     
-    async def forward_to_group(self, message, code):
+    async def forward_to_group(self, message):
         """Forward approved message to group"""
         try:
-            await self.client.forward_messages(config.TARGET_GROUP, message)
-            print(f"📤 Approved message forwarded to group for code: {code}")
+            await self.client.forward_messages(TARGET_GROUP, message)
+            print(f"📤 Message forwarded to group for code: {self.current_code}")
             return True
         except Exception as e:
             print(f"❌ Failed to forward message: {e}")
             return False
     
-    async def process_bot_response(self, event):
-        """Process responses from the target bot"""
+    async def handle_bot_response(self, event):
+        """Handle responses from the target bot"""
         if not event.is_private:
             return
             
@@ -70,97 +87,109 @@ class TelegramBotAutomation:
         if not sender or not sender.username:
             return
             
-        if sender.username.lower() != config.TARGET_BOT.lower():
+        # Check if message is from target bot
+        if sender.username.lower() != TARGET_BOT.lstrip('@').lower():
             return
         
-        message_text = event.raw_text.lower()
-        print(f"🤖 Bot replied: {event.raw_text}")
+        message_text = event.raw_text
+        print(f"🤖 Bot replied: {message_text}")
         
-        # Extract code from message (you might need to adjust this based on bot's response format)
-        code = self.extract_code_from_message(event.raw_text)
-        
-        if not code:
-            print("⚠️ Could not extract code from bot response")
+        # Skip "checking" messages
+        if any(word in message_text.lower() for word in ['checking', 'processing', 'verifying', 'please wait']):
+            print("⏳ Bot is checking... waiting for final result")
             return
         
-        if any(word in message_text for word in ['approve', 'approved', 'success', 'valid', 'correct']):
-            print(f"🎉 Code approved: {code}")
-            self.save_approved_code(code)
-            
-            # Forward the message to group
-            await self.forward_to_group(event.message, code)
-            
-        elif any(word in message_text for word in ['decline', 'declined', 'invalid', 'wrong', 'error']):
-            print(f"❌ Code declined: {code}")
-            self.save_declined_code(code)
-    
-    def extract_code_from_message(self, message):
-        """Extract code from bot response - adjust based on your bot's response format"""
-        # Simple extraction - you might need to customize this
-        words = message.split()
-        for word in words:
-            if len(word) >= 6 and any(char.isdigit() for char in word):
-                return word
-        return None
+        # Check if we're waiting for a result and this is the final response
+        if self.waiting_for_result and self.current_code:
+            # Check for approve/decline keywords
+            if any(word in message_text.lower() for word in ['approve', 'approved', 'success', 'valid', 'correct', 'working']):
+                self.save_approved(self.current_code, message_text)
+                await self.forward_to_group(event.message)
+                self.waiting_for_result = False
+                self.current_code = None
+                
+            elif any(word in message_text.lower() for word in ['decline', 'declined', 'invalid', 'wrong', 'error', 'failed', 'not valid']):
+                self.save_declined(self.current_code, message_text)
+                self.waiting_for_result = False
+                self.current_code = None
     
     async def run_automation(self):
         """Main automation function"""
         await self.client.start()
         print("🚀 Telegram client started!")
+        print(f"🤖 Target bot: {TARGET_BOT}")
+        print(f"👥 Target group: {TARGET_GROUP}")
         
         # Add event handler for bot responses
         self.client.add_event_handler(
-            self.process_bot_response,
+            self.handle_bot_response,
             events.NewMessage(incoming=True)
         )
         
         # Read codes from file
         try:
-            with open(config.CODES_FILE, 'r') as f:
-                codes = [line.strip() for line in f if line.strip()]
+            with open(CODES_FILE, 'r') as f:
+                all_codes = [line.strip() for line in f if line.strip()]
         except FileNotFoundError:
-            print(f"❌ Codes file '{config.CODES_FILE}' not found!")
+            print(f"❌ Codes file '{CODES_FILE}' not found!")
             return
         
-        if not codes:
+        if not all_codes:
             print("❌ No codes found in the file!")
             return
         
-        print(f"📄 Found {len(codes)} codes to process")
-        
         # Filter out already processed codes
-        new_codes = [
-            code for code in codes 
-            if code not in self.approved_codes and code not in self.declined_codes
-        ]
+        new_codes = [code for code in all_codes if code not in self.processed_codes]
         
         if not new_codes:
             print("✅ All codes have been processed already!")
             return
         
-        print(f"🆕 {len(new_codes)} new codes to send")
+        print(f"📄 Total codes: {len(all_codes)} | New codes: {len(new_codes)}")
         
-        # Send codes one by one
-        for i, code in enumerate(new_codes, 1):
-            print(f"\n📤 Sending code {i}/{len(new_codes)}: {code}")
+        # Process codes one by one
+        for index, code in enumerate(new_codes, 1):
+            print(f"\n{'='*50}")
+            print(f"🔄 Processing code {index}/{len(new_codes)}: {code}")
             
-            success = await self.send_code_to_bot(code)
+            # Send the code
+            success = await self.send_code(code)
+            if not success:
+                continue
             
-            if success:
-                print(f"⏳ Waiting {config.DELAY_BETWEEN_CODES} seconds...")
-                await asyncio.sleep(config.DELAY_BETWEEN_CODES)
-            else:
-                print("⚠️ Skipping to next code after failure...")
+            # Wait for bot response with timeout
+            max_wait_time = 30  # Maximum wait time for bot response in seconds
+            start_time = time.time()
+            
+            while self.waiting_for_result and (time.time() - start_time) < max_wait_time:
+                elapsed = time.time() - start_time
+                print(f"⏰ Waiting for result... {int(elapsed)}s/{max_wait_time}s", end='\r')
+                await asyncio.sleep(2)
+            
+            if self.waiting_for_result:
+                print(f"\n⏰ Timeout waiting for response for code: {code}")
+                self.save_declined(code, "TIMEOUT - No response from bot")
+                self.waiting_for_result = False
+                self.current_code = None
+            
+            # Delay before next code
+            if index < len(new_codes):
+                print(f"⏳ Waiting {DELAY_BETWEEN_CODES} seconds before next code...")
+                await asyncio.sleep(DELAY_BETWEEN_CODES)
         
-        print("\n🎯 Automation completed! Waiting for bot responses...")
-        print("Press Ctrl+C to stop")
-        
-        # Keep running to listen for bot responses
-        await self.client.run_until_disconnected()
+        print(f"\n{'='*50}")
+        print("🎯 All codes processed!")
+        print("📊 Summary:")
+        print(f"   📁 Approved: {APPROVED_FILE}")
+        print(f"   📁 Declined: {DECLINED_FILE}")
+        print("\nPress Ctrl+C to exit")
 
 async def main():
-    automation = TelegramBotAutomation()
+    automation = TelegramAutomation()
     await automation.run_automation()
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\n\n👋 Script stopped by user")
